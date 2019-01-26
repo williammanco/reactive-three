@@ -1,0 +1,37 @@
+{
+  "name": "reactive-three",
+  "version": "0.1.0",
+  "description": "React.js -> Three.js",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com"
+  },
+  "scripts": {
+    "build": "malmo build"
+  },
+  "keywords": [],
+  "author": "William Manco <wmanco88@gmail.com>",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "uuid": "^3.3.2"
+  },
+  "peerDependencies": {
+    "react": "^16.7.0-alpha.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
+    "@malmo/eslint-config": "^1.0.0",
+    "eslint": "^4.19.1 || ^5.3.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.15.0",
+    "eslint-plugin-jsx-a11y": "^6.2.0",
+    "eslint-plugin-react": "^7.12.4",
+    "prop-types": "^15.6.2"
+  },
+  "gitHead": ""
+}
