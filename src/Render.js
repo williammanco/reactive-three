@@ -22,7 +22,6 @@ const Render = ({
     renderTarget: false,
     forceClear: false,
   });
-  const key = useRef();
   const update = useRef();
 
   const pureProps = usePureProps(props, [
@@ -41,10 +40,35 @@ const Render = ({
 
   const currentRender = useMemo(
     () => {
-      const index = state.render.findIndex(e => e.key === key.current);
+      const index = state.render.findIndex(e => e.key === baseRender.key);
       if (index >= 0) return state.render[index];
       return false;
     }, [state.render],
+  );
+
+  const onResize = useCallback(
+    () => {
+      if (!self.current.renderer) return;
+      const { renderer } = self.current;
+      const { domElement } = renderer;
+      let wrapper = global.document.body.getBoundingClientRect();
+
+      if (domElement.parentElement) {
+        wrapper = domElement.parentElement.getBoundingClientRect();
+      }
+
+      const { width, height } = wrapper;
+      renderer.setSize(width, height);
+
+      if (!update.current) return;
+      const { camera } = update.current;
+
+      for (let i = 0; i < camera.length; i += 1) {
+        camera[i].aspect = width / height;
+        camera[i].updateProjectionMatrix();
+      }
+    },
+    [],
   );
 
   const onRender = useCallback(
@@ -62,6 +86,7 @@ const Render = ({
       if (clearDepth) renderer.clearDepth();
       if (clearColor) renderer.clearColor();
       if (clearStencil) renderer.clearStencil();
+
       if (camera.length === 1) {
         renderer.render(scene[0], camera[0], rtt, fClear);
       } else if (camera.length > 1) {
@@ -79,10 +104,12 @@ const Render = ({
     () => {
       dispatch(actions.addRender(baseRender));
       dispatch(actions.addRaf(onRender));
-      key.current = baseRender.key;
+      dispatch(actions.addResize(onResize));
+
       return () => {
         dispatch(actions.removeRender(baseRender));
         dispatch(actions.removeRaf(onRender));
+        dispatch(actions.removeResize(onResize));
       };
     },
     [],
@@ -92,6 +119,7 @@ const Render = ({
     () => {
       if (state.render.length > 0) {
         update.current = currentRender;
+        onResize();
       }
     },
     [state.render],
@@ -107,8 +135,9 @@ const Render = ({
     [parent, renderTarget, forceClear],
   );
 
-
-  return render(children, key.current);
+  return render(children, baseRender.key, {
+    renderer: parent,
+  });
 };
 
 Render.defaultProps = {

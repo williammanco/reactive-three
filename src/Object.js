@@ -1,23 +1,23 @@
 import {
   useEffect,
   useRef,
+  forwardRef,
 } from 'react';
-import {
-  Mesh as MeshThree,
-} from 'three';
 import render from './core/render';
 import { usePureProps, useUpdateProps } from './hooks';
 
-const Mesh = ({
-  getRef,
+const THREE = require('three');
+
+const Object3D = forwardRef(({
   children,
   parent,
   geometry,
   material,
   external,
   use,
+  call,
   ...props
-}) => {
+}, ref) => {
   const self = useRef({});
   const { instance } = self.current;
 
@@ -31,7 +31,7 @@ const Mesh = ({
     () => {
       if (self.current.instance) return;
 
-      const Instance = use;
+      const Instance = call || THREE[use];
       if (external) {
         self.current.instance = external;
         if (geometry) external.geometry = geometry;
@@ -40,7 +40,7 @@ const Mesh = ({
         self.current.instance = new Instance(geometry, material);
       }
 
-      getRef(self.current.instance);
+      if (ref) ref(self.current.instance);
     }, [geometry, material, external],
   );
 
@@ -67,12 +67,12 @@ const Mesh = ({
   useUpdateProps(instance, pureProps);
 
   return render(children, instance);
-};
+});
 
-Mesh.defaultProps = {
-  getRef: () => false,
+Object3D.defaultProps = {
   external: false,
-  use: MeshThree,
+  call: false,
+  use: 'Mesh',
 };
 
-export default Mesh;
+export default Object3D;

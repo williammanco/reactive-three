@@ -2,7 +2,7 @@ module.exports = () => ({
   output: {
     filename: 'index.js',
     libraryTarget: 'commonjs2',
-    library: 'ReactWrapThree',
+    library: 'reactive-three',
     umdNamedDefine: true,
   },
   externals: {

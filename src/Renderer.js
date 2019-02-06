@@ -1,30 +1,35 @@
 import {
   useCallback,
   useEffect,
-  useContext,
   useRef,
+  useState,
+  Fragment,
+  createElement,
+  forwardRef,
 } from 'react';
-import { WebGLRenderer } from 'three';
+import PropTypes from 'prop-types';
+import { nodeTypes, stringTypes } from './utils/propsTypes';
 import render from './core/render';
-import Context, { actions } from './context';
 import { usePureProps, useUpdateProps } from './hooks';
 
-const Renderer = ({
+const THREE = require('three');
+
+const Renderer = forwardRef(({
   children,
   pixelRatio,
   target,
-  getRef,
   use,
+  call,
   options,
   ...props
-}) => {
+}, ref) => {
   const pureProps = usePureProps(props, [
     'pixelRatio',
     'target',
   ]);
 
-  const { dispatch } = useContext(Context);
   const self = useRef({});
+  const forceUpdate = useState()[1];
 
   const destroy = useCallback(
     () => {
@@ -38,57 +43,64 @@ const Renderer = ({
     [],
   );
 
-  const onResize = useCallback(
-    (width, height) => {
-      const { instance } = self.current;
-      instance.setSize(width, height);
-    },
-    [],
-  );
-
   useEffect(
     () => {
-      const Instance = use;
-
+      const Instance = call || THREE[use];
       self.current.instance = new Instance(
         Object.assign(
           {
             antialising: false,
             alpha: false,
-            canvas: undefined,
+            canvas: !target ? self.current.canvas : undefined,
           },
           options,
         ),
       );
+
       const { instance } = self.current;
+      if (target) {
+        global.document.querySelector(target).appendChild(instance.domElement);
+      }
 
-      getRef(instance);
-
-      dispatch(actions.addResize(onResize));
       instance.setPixelRatio(pixelRatio);
 
-      // eslint-disable-next-line no-undef
-      document.querySelector(target).appendChild(instance.domElement);
+      if (ref) ref(self.current.instance);
+
+      forceUpdate(true);
 
       return () => {
         destroy();
       };
     },
-    [],
+    [target],
   );
   const { instance } = self.current;
 
   useUpdateProps(instance, pureProps);
 
-  return render(children, instance);
+  return target ? render(children, instance) : createElement(
+    Fragment,
+    null,
+    createElement('canvas', { ref: e => self.current.canvas = e }),
+    render(children, instance),
+  );
+});
+
+
+Renderer.propTypes = {
+  pixelRatio: PropTypes.number,
+  target: stringTypes,
+  call: nodeTypes,
+  use: PropTypes.string,
+  options: PropTypes.object,
 };
 
 Renderer.defaultProps = {
-  target: 'body',
-  pixelRatio: global.devicePixelRatio,
+  target: false,
+  call: false,
   options: {},
-  getRef: () => false,
-  use: WebGLRenderer,
+  pixelRatio: global.devicePixelRatio,
+  use: 'WebGLRenderer',
 };
 
 export default Renderer;

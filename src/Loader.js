@@ -1,15 +1,15 @@
 import {
   useEffect,
   useRef,
+  useState,
+  forwardRef,
 } from 'react';
-import {
-  TextureLoader,
-} from 'three';
 import render from './core/render';
-import { usePureProps, useUpdateProps } from './hooks';
+import { usePureProps, useUpdateProps, useWillMount } from './hooks';
 
-const Loader = ({
-  getRef,
+const THREE = require('three');
+
+const Loader = forwardRef(({
   children,
   parent,
   options,
@@ -18,10 +18,11 @@ const Loader = ({
   onLoad,
   onProgress,
   onError,
+  call,
   ...props
-}) => {
+}, ref) => {
   const self = useRef({});
-  const { instance } = self.current;
+  const [loaded, setLoaded] = useState();
 
   const pureProps = usePureProps(props, [
     'url',
@@ -30,46 +31,45 @@ const Loader = ({
     'onError',
   ]);
 
-  useEffect(
-    () => {
-      if (self.current.instance) return;
+  useWillMount(() => {
+    if (self.current.instance) return;
 
-      const Instance = use;
-      self.current.instance = new Instance(...options);
-      getRef(self.current.instance);
-    },
-    [],
-  );
+    const Instance = call || THREE[use];
+    self.current.instance = new Instance(...options);
+    if (ref) ref(self.current.instance);
+  });
 
   useEffect(
     () => {
-      if (!instance || !url) return;
-
+      const { instance } = self.current;
       instance.load(
         url,
         (object) => {
           self.current.loaded = object;
+          setLoaded(object);
           onLoad(object);
         },
         onProgress,
         onError,
       );
     },
-    [instance],
+    [],
   );
+
+  const { instance } = self.current;
 
   useUpdateProps(instance, pureProps);
 
-  return render(children, self.current.loaded, false, true);
-};
+  return render(children, loaded, false, true);
+});
 
 Loader.defaultProps = {
-  getRef: () => false,
   options: [],
   onLoad: () => false,
   onProgress: () => false,
   onError: () => false,
-  use: TextureLoader,
+  call: false,
+  use: 'TextureLoader',
 };
 
 export default Loader;

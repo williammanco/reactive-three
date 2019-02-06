@@ -9,6 +9,8 @@ module.exports = {
     'import/no-unresolved': 'off',
     'consistent-return': 'off',
     'no-param-reassign': 'off',
+    'react/forbid-prop-types': 'off',
+    'no-return-assign': 'off',
   },
   settings: {
     'import/resolver': {

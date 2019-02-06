@@ -8,10 +8,10 @@ export default (props, excludeProps = []) => useMemo(
       ...excludeProps,
       'children',
       'parent',
-      'getRef',
       'options',
       'loaded',
       'use',
+      'call',
     ],
   ), [props, excludeProps],
 );

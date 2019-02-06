@@ -1,31 +1,36 @@
 import {
   useEffect,
   useRef,
+  forwardRef,
 } from 'react';
-import {
-  WebGLRenderTarget,
-} from 'three';
+import PropTypes from 'prop-types';
+import { nodeTypes } from './utils/propsTypes';
 import render from './core/render';
 import { usePureProps, useUpdateProps } from './hooks';
 
-const RenderTarget = ({
-  getRef,
+const THREE = require('three');
+
+const RenderTarget = forwardRef(({
   children,
   parent,
   options,
   use,
+  call,
   ...props
-}) => {
+}, ref) => {
   const self = useRef({});
   const pureProps = usePureProps(props);
   const { instance } = self.current;
 
   useEffect(
     () => {
-      const Instance = use;
+      const Instance = call || THREE[use];
       if (instance) instance.dispose();
       self.current.instance = new Instance(...options);
-      getRef(self.current.instance);
+      if (ref) ref(self.current.instance);
+      return () => {
+        if (instance) instance.dispose();
+      };
     },
     [use],
   );
@@ -35,12 +40,19 @@ const RenderTarget = ({
   return render(children, parent, {
     renderTarget: instance,
   });
+});
+
+RenderTarget.propTypes = {
+  call: nodeTypes,
+  use: PropTypes.string,
+  options: PropTypes.array,
 };
 
+
 RenderTarget.defaultProps = {
-  getRef: () => false,
+  call: false,
   options: [],
-  use: WebGLRenderTarget,
+  use: 'WebGLRenderTarget',
 };
 
 export default RenderTarget;

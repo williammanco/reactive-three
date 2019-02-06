@@ -2,17 +2,21 @@ import { cloneElement } from 'react';
 
 export default (children, instance, props = {}, onlyFunc) => {
   let arr = [];
-  // eslint-disable-next-line no-unused-expressions
-  Array.isArray(children) ? arr = children : arr.push(children);
+  if (Array.isArray(children)) {
+    arr = children;
+  } else {
+    arr.push(children);
+  }
   return arr
-    .map((child) => {
+    .map((child, key) => {
       if (typeof child === 'function') {
-        return child(instance, { ...props });
+        return child(instance, { ...props, key });
       }
       if (typeof child === 'object' && !onlyFunc) {
         return cloneElement(child, {
           ...props,
           parent: instance,
+          key,
         });
       }
       return false;

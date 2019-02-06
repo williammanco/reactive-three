@@ -1,13 +1,14 @@
+/* eslint-disable default-case */
 import { ACTIONS } from './actions';
 
-const getIndexbyKey = (list, key) => (key && list.findIndex(e => e.key === key));
-const getIndexbyFunc = (list, payload) => (payload && list.findIndex(f => f === payload));
+const getIndexByKey = (list, key) => (key && list.findIndex(e => e.key === key));
+const getIndexByFunc = (list, payload) => (payload && list.findIndex(f => f === payload));
 
 const reduceList = (id, type, state, action) => {
   const newState = state[id].slice();
   const { payload } = action;
-  const index = getIndexbyFunc(newState, payload);
-  // eslint-disable-next-line default-case
+  const index = getIndexByFunc(newState, payload);
+
   switch (type) {
     case 'add':
       newState.push(payload);
@@ -22,8 +23,7 @@ const reduceList = (id, type, state, action) => {
 const reduceSubList = (id, type, state, action) => {
   const newState = state.render.slice();
   const { payload, key } = action;
-  // const index = getIndexbyFunc(newState, payload);
-  const indexRender = getIndexbyKey(newState, key);
+  const indexRender = getIndexByKey(newState, key);
 
   if (indexRender === -1) return { ...state };
 
@@ -34,12 +34,13 @@ const reduceSubList = (id, type, state, action) => {
       break;
     case 'remove':
       // eslint-disable-next-line no-case-declarations
-      const indexScene = getIndexbyFunc(newState[indexRender][id], payload);
+      const indexScene = getIndexByFunc(newState[indexRender][id], payload);
       if (indexScene > -1) newState[indexRender][id].splice(indexScene, 1);
       break;
   }
   return { ...state, render: newState };
 };
+
 
 const reducers = {};
 

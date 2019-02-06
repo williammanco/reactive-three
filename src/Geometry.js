@@ -1,33 +1,33 @@
 import {
   useEffect,
   useRef,
+  forwardRef,
 } from 'react';
-import {
-  BoxBufferGeometry,
-} from 'three';
 import render from './core/render';
 import { usePureProps, useUpdateProps } from './hooks';
 
-const Geometry = ({
-  getRef,
+const THREE = require('three');
+
+const Geometry = forwardRef(({
   children,
   parent,
   geometry,
   material,
   options,
   use,
+  call,
   ...props
-}) => {
+}, ref) => {
   const self = useRef({});
   const pureProps = usePureProps(props);
   const { instance } = self.current;
 
   useEffect(
     () => {
-      const Instance = use;
+      const Instance = call || THREE[use];
       if (instance) instance.dispose();
       self.current.instance = new Instance(...options);
-      getRef(self.current.instance);
+      if (ref) ref(self.current.instance);
     },
     [use],
   );
@@ -38,12 +38,12 @@ const Geometry = ({
     material,
     geometry: instance,
   });
-};
+});
 
 Geometry.defaultProps = {
-  getRef: () => false,
   options: [1, 1, 1],
-  use: BoxBufferGeometry,
+  call: false,
+  use: 'BoxBufferGeometry',
 };
 
 export default Geometry;

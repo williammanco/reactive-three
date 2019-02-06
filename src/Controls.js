@@ -8,11 +8,10 @@ import { usePureProps, useUpdateProps } from './hooks';
 
 const THREE = require('three');
 
-const Material = forwardRef(({
+const Controls = forwardRef(({
+  getRef,
   children,
   parent,
-  geometry,
-  material,
   options,
   use,
   call,
@@ -24,29 +23,26 @@ const Material = forwardRef(({
 
   useEffect(
     () => {
-      const Instance = call || THREE[use];
       if (instance) instance.dispose();
-      self.current.instance = new Instance(...options);
+      if (!parent) return;
+      const Instance = call || THREE[use];
+      self.current.instance = new Instance(parent, ...options);
+      self.current.instance.update();
       if (ref) ref(self.current.instance);
-      return () => {
-        if (instance) instance.dispose();
-      };
     },
-    [use],
+    [parent],
   );
 
   useUpdateProps(instance, pureProps);
 
-  return render(children, parent, {
-    geometry,
-    material: instance,
-  });
+  return render(children, parent);
 });
 
-Material.defaultProps = {
+Controls.defaultProps = {
+  getRef: () => false,
   options: [],
   call: false,
-  use: 'MeshNormalMaterial',
+  use: 'OrbitControls',
 };
 
-export default Material;
+export default Controls;

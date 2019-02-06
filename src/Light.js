@@ -1,21 +1,21 @@
 import {
   useEffect,
   useRef,
+  forwardRef,
 } from 'react';
-import {
-  PointLight,
-} from 'three';
 import render from './core/render';
 import { usePureProps, useUpdateProps } from './hooks';
 
-const Light = ({
-  getRef,
+const THREE = require('three');
+
+const Light = forwardRef(({
   children,
   parent,
   options,
   use,
+  call,
   ...props
-}) => {
+}, ref) => {
   const self = useRef({});
   const { instance } = self.current;
 
@@ -25,9 +25,9 @@ const Light = ({
     () => {
       if (self.current.instance) return;
 
-      const Instance = use;
+      const Instance = call || THREE[use];
       self.current.instance = new Instance(...options);
-      getRef(self.current.instance);
+      if (ref) ref(self.current.instance);
     },
     [],
   );
@@ -46,12 +46,12 @@ const Light = ({
   useUpdateProps(instance, pureProps);
 
   return render(children, instance);
-};
+});
 
 Light.defaultProps = {
-  getRef: () => false,
   options: [],
-  use: PointLight,
+  call: false,
+  use: 'PointLight',
 };
 
 export default Light;
