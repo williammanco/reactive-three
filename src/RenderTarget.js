@@ -13,7 +13,7 @@ const THREE = require('three');
 const RenderTarget = forwardRef(function RenderTarget({
   children,
   parent,
-  options,
+  params,
   use,
   call,
   ...props
@@ -26,7 +26,7 @@ const RenderTarget = forwardRef(function RenderTarget({
     () => {
       const Instance = call || THREE[use];
       if (instance) instance.dispose();
-      self.current.instance = new Instance(...options);
+      self.current.instance = new Instance(...params);
       if (ref) ref(self.current.instance);
       return () => {
         if (instance) instance.dispose();
@@ -45,13 +45,13 @@ const RenderTarget = forwardRef(function RenderTarget({
 RenderTarget.propTypes = {
   call: nodeTypes,
   use: PropTypes.string,
-  options: PropTypes.array,
+  params: PropTypes.array,
 };
 
 
 RenderTarget.defaultProps = {
   call: false,
-  options: [],
+  params: [],
   use: 'WebGLRenderTarget',
 };
 

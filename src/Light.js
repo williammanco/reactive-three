@@ -11,7 +11,7 @@ const THREE = require('three');
 const Light = forwardRef(function Light({
   children,
   parent,
-  options,
+  params,
   use,
   call,
   ...props
@@ -26,7 +26,7 @@ const Light = forwardRef(function Light({
       if (self.current.instance) return;
 
       const Instance = call || THREE[use];
-      self.current.instance = new Instance(...options);
+      self.current.instance = new Instance(...params);
       if (ref) ref(self.current.instance);
     },
     [],
@@ -49,7 +49,7 @@ const Light = forwardRef(function Light({
 });
 
 Light.defaultProps = {
-  options: [],
+  params: [],
   call: false,
   use: 'PointLight',
 };

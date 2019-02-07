@@ -15,7 +15,7 @@ const Object3D = forwardRef(function Object3D({
   material,
   loaded,
   loader,
-  options,
+  params,
   use,
   call,
   ...props
@@ -43,7 +43,7 @@ const Object3D = forwardRef(function Object3D({
       } else if (geometry && material) {
         self.current.instance = new Instance(geometry, material);
       } else {
-        self.current.instance = new Instance(...options);
+        self.current.instance = new Instance(...params);
       }
 
       if (ref) ref(self.current.instance);
@@ -85,7 +85,7 @@ const Object3D = forwardRef(function Object3D({
 Object3D.defaultProps = {
   loaded: false,
   call: false,
-  options: [],
+  params: [],
   use: 'Mesh',
 };
 

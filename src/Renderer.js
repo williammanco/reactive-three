@@ -20,7 +20,7 @@ const Renderer = forwardRef(function Renderer({
   target,
   use,
   call,
-  options,
+  params,
   ...props
 }, ref) {
   const pureProps = usePureProps(props, [
@@ -49,11 +49,9 @@ const Renderer = forwardRef(function Renderer({
       self.current.instance = new Instance(
         Object.assign(
           {
-            antialising: false,
-            alpha: false,
             canvas: !target ? self.current.canvas : undefined,
           },
-          options,
+          params[0],
         ),
       );
 
@@ -92,13 +90,13 @@ Renderer.propTypes = {
   target: stringTypes,
   call: nodeTypes,
   use: PropTypes.string,
-  options: PropTypes.object,
+  params: PropTypes.array,
 };
 
 Renderer.defaultProps = {
   target: false,
   call: false,
-  options: {},
+  params: [{}],
   pixelRatio: global.devicePixelRatio,
   use: 'WebGLRenderer',
 };

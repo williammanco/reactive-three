@@ -12,7 +12,7 @@ const Controls = forwardRef(function Controls({
   getRef,
   children,
   parent,
-  options,
+  params,
   use,
   call,
   ...props
@@ -26,7 +26,7 @@ const Controls = forwardRef(function Controls({
       if (instance) instance.dispose();
       if (!parent) return;
       const Instance = call || THREE[use];
-      self.current.instance = new Instance(parent, ...options);
+      self.current.instance = new Instance(parent, ...params);
       self.current.instance.update();
       if (ref) ref(self.current.instance);
     },
@@ -40,7 +40,7 @@ const Controls = forwardRef(function Controls({
 
 Controls.defaultProps = {
   getRef: () => false,
-  options: [],
+  params: [],
   call: false,
   use: 'OrbitControls',
 };

@@ -1,3 +1,4 @@
+import setUUID from 'uuid/v4';
 import Renderer from './Renderer';
 import Scene from './Scene';
 import Object from './Object';
@@ -10,6 +11,10 @@ import Loader from './Loader';
 import RenderTarget from './RenderTarget';
 import Controls from './Controls';
 import Context, { Provider, Consumer, actions } from './context';
+import render from './core/render';
+import * as hooks from './hooks';
+import * as propsTypes from './utils/propsTypes';
+import omit from './utils/omit';
 
 export {
   Renderer,
@@ -27,4 +32,9 @@ export {
   Consumer,
   Controls,
   actions,
+  render,
+  hooks,
+  propsTypes,
+  omit,
+  setUUID,
 };

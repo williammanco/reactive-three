@@ -14,7 +14,7 @@ const Material = forwardRef(function Material({
   geometry,
   material,
   loaded,
-  options,
+  params,
   use,
   call,
   ...props
@@ -27,7 +27,7 @@ const Material = forwardRef(function Material({
     () => {
       const Instance = call || THREE[use];
       if (instance) instance.dispose();
-      self.current.instance = new Instance(...options);
+      self.current.instance = new Instance(...params);
       if (ref) ref(self.current.instance);
       return () => {
         if (instance) instance.dispose();
@@ -55,7 +55,7 @@ const Material = forwardRef(function Material({
 });
 
 Material.defaultProps = {
-  options: [],
+  params: [],
   call: false,
   use: 'MeshNormalMaterial',
 };

@@ -15,7 +15,7 @@ const THREE = require('three');
 const Camera = forwardRef(function Camera({
   children,
   parent,
-  options,
+  params,
   use,
   call,
   ...props
@@ -28,7 +28,7 @@ const Camera = forwardRef(function Camera({
   useEffect(
     () => {
       const Instance = call || THREE[use];
-      self.current.instance = new Instance(...options);
+      self.current.instance = new Instance(...params);
       if (ref) ref(self.current.instance);
     },
     [],
@@ -54,11 +54,11 @@ Camera.propTypes = {
   children: nodeTypes,
   call: nodeTypes,
   use: PropTypes.string,
-  options: PropTypes.array,
+  params: PropTypes.array,
 };
 
 Camera.defaultProps = {
-  options: [],
+  params: [],
   call: false,
   use: 'PerspectiveCamera',
 };

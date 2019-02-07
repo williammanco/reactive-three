@@ -12,7 +12,7 @@ const THREE = require('three');
 const Loader = forwardRef(function Loader({
   children,
   parent,
-  options,
+  params,
   use,
   url,
   onLoad,
@@ -34,7 +34,7 @@ const Loader = forwardRef(function Loader({
   useWillMount(() => {
     if (self.current.instance) return;
     const Instance = call || THREE[use];
-    self.current.instance = new Instance(...options);
+    self.current.instance = new Instance(...params);
     if (ref) ref(self.current.instance);
   });
 
@@ -68,7 +68,7 @@ const Loader = forwardRef(function Loader({
 });
 
 Loader.defaultProps = {
-  options: [],
+  params: [],
   onLoad: () => false,
   onProgress: () => false,
   onError: () => false,
