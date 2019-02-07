@@ -10,14 +10,14 @@ import { usePureProps, useUpdateProps } from './hooks';
 
 const THREE = require('three');
 
-const RenderTarget = forwardRef(({
+const RenderTarget = forwardRef(function RenderTarget({
   children,
   parent,
   options,
   use,
   call,
   ...props
-}, ref) => {
+}, ref) {
   const self = useRef({});
   const pureProps = usePureProps(props);
   const { instance } = self.current;

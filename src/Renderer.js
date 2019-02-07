@@ -14,7 +14,7 @@ import { usePureProps, useUpdateProps } from './hooks';
 
 const THREE = require('three');
 
-const Renderer = forwardRef(({
+const Renderer = forwardRef(function Renderer({
   children,
   pixelRatio,
   target,
@@ -22,7 +22,7 @@ const Renderer = forwardRef(({
   call,
   options,
   ...props
-}, ref) => {
+}, ref) {
   const pureProps = usePureProps(props, [
     'pixelRatio',
     'target',

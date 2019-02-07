@@ -9,7 +9,7 @@ import { usePureProps, useUpdateProps, useWillMount } from './hooks';
 
 const THREE = require('three');
 
-const Loader = forwardRef(({
+const Loader = forwardRef(function Loader({
   children,
   parent,
   options,
@@ -20,7 +20,7 @@ const Loader = forwardRef(({
   onError,
   call,
   ...props
-}, ref) => {
+}, ref) {
   const self = useRef({});
   const [loaded, setLoaded] = useState();
 
@@ -33,7 +33,6 @@ const Loader = forwardRef(({
 
   useWillMount(() => {
     if (self.current.instance) return;
-
     const Instance = call || THREE[use];
     self.current.instance = new Instance(...options);
     if (ref) ref(self.current.instance);
@@ -42,6 +41,7 @@ const Loader = forwardRef(({
   useEffect(
     () => {
       const { instance } = self.current;
+
       instance.load(
         url,
         (object) => {
@@ -60,7 +60,11 @@ const Loader = forwardRef(({
 
   useUpdateProps(instance, pureProps);
 
-  return render(children, loaded, false, true);
+  return render(children, parent, {
+    loaded,
+    loader: true,
+    ...pureProps,
+  });
 });
 
 Loader.defaultProps = {

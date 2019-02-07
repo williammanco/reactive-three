@@ -8,7 +8,7 @@ import { usePureProps, useUpdateProps } from './hooks';
 
 const THREE = require('three');
 
-const Geometry = forwardRef(({
+const Geometry = forwardRef(function Geometry({
   children,
   parent,
   geometry,
@@ -17,7 +17,7 @@ const Geometry = forwardRef(({
   use,
   call,
   ...props
-}, ref) => {
+}, ref) {
   const self = useRef({});
   const pureProps = usePureProps(props);
   const { instance } = self.current;

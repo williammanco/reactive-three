@@ -12,13 +12,13 @@ import { usePureProps, useUpdateProps } from './hooks';
 
 const THREE = require('three');
 
-const Scene = forwardRef(({
+const Scene = forwardRef(function Scene({
   children,
   parent,
   use,
   call,
   ...props
-}, ref) => {
+}, ref) {
   const { dispatch } = useContext(Context);
   const self = useRef({});
   const pureProps = usePureProps(props, ['renderer']);

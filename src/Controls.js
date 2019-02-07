@@ -8,7 +8,7 @@ import { usePureProps, useUpdateProps } from './hooks';
 
 const THREE = require('three');
 
-const Controls = forwardRef(({
+const Controls = forwardRef(function Controls({
   getRef,
   children,
   parent,
@@ -16,7 +16,7 @@ const Controls = forwardRef(({
   use,
   call,
   ...props
-}, ref) => {
+}, ref) {
   const self = useRef({});
   const pureProps = usePureProps(props);
   const { instance } = self.current;

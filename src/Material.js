@@ -8,16 +8,17 @@ import { usePureProps, useUpdateProps } from './hooks';
 
 const THREE = require('three');
 
-const Material = forwardRef(({
+const Material = forwardRef(function Material({
   children,
   parent,
   geometry,
   material,
+  loaded,
   options,
   use,
   call,
   ...props
-}, ref) => {
+}, ref) {
   const self = useRef({});
   const pureProps = usePureProps(props);
   const { instance } = self.current;
@@ -33,6 +34,16 @@ const Material = forwardRef(({
       };
     },
     [use],
+  );
+
+  useEffect(
+    () => {
+      if (typeof loaded === 'object') {
+        self.current.instance.map = loaded;
+        self.current.instance.needsUpdate = true;
+      }
+    },
+    [loaded],
   );
 
   useUpdateProps(instance, pureProps);

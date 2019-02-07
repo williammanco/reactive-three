@@ -11,6 +11,7 @@ module.exports = {
     'no-param-reassign': 'off',
     'react/forbid-prop-types': 'off',
     'no-return-assign': 'off',
+    'prefer-arrow-callback': 'off'
   },
   settings: {
     'import/resolver': {

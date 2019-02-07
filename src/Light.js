@@ -8,14 +8,14 @@ import { usePureProps, useUpdateProps } from './hooks';
 
 const THREE = require('three');
 
-const Light = forwardRef(({
+const Light = forwardRef(function Light({
   children,
   parent,
   options,
   use,
   call,
   ...props
-}, ref) => {
+}, ref) {
   const self = useRef({});
   const { instance } = self.current;
 
