@@ -1,85 +1,61 @@
 import {
   useEffect,
   useRef,
+  useContext,
   forwardRef,
 } from 'react';
 import render from './core/render';
-import { usePureProps, useUpdateProps } from './hooks';
-
-const THREE = require('three');
+import Context from './context';
+import { usePureProps, useUpdateProps, useInstance } from './hooks';
 
 const Object3D = forwardRef(function Object3D({
   children,
   parent,
-  geometry,
-  material,
   loaded,
   loader,
-  params,
-  use,
-  call,
   ...props
 }, ref) {
-  const self = useRef({});
+  const instance = useRef();
 
-  const pureProps = usePureProps(props, [
-    'material',
-    'geometry',
-  ]);
+  const { state } = useContext(Context);
+  const pureProps = usePureProps(props);
+  const context = useRef(state);
+
+  const geometry = props.geometry || props.params[0] || context.current.geometry;
+  const material = props.material || props.params[1] || context.current.material;
+
+  instance.current = useInstance({
+    ...props,
+    params: [
+      geometry,
+      material,
+      ...props.params.slice(2),
+    ],
+  }, ref, loaded || loader);
 
   useEffect(
     () => {
-      const Instance = call || THREE[use];
-      if (loaded || loader) {
-        if (loaded) {
-          loaded.traverse((child) => {
-            if (child.type === 'Mesh') {
-              if (geometry) child.geometry = geometry;
-              if (material) child.material = material;
-            }
-          });
-          self.current.instance = loaded;
-        }
-      } else if (geometry && material) {
-        self.current.instance = new Instance(geometry, material);
-      } else {
-        self.current.instance = new Instance(...params);
+      if (loader && !loaded) return;
+      const { container } = context.current;
+
+      if (loaded.isObject3D) {
+        if (geometry) loaded.geometry = geometry;
+        if (material) loaded.material = material;
+        instance.current = loaded;
       }
 
-      if (ref) ref(self.current.instance);
-    }, [geometry, material, loaded],
-  );
+      container.current.add(instance.current);
 
-
-  useEffect(
-    () => {
-      const { instance } = self.current;
-
-      if (!parent || !instance) return;
-
-      parent.add(instance);
       return () => {
-        parent.remove(instance);
+        container.current.remove(instance.current);
       };
     },
-    [parent, loaded],
+    [loaded],
   );
-
-  useEffect(
-    () => {
-      const { instance } = self.current;
-      if (!instance) return;
-      instance.material = material;
-      instance.geometry = geometry;
-    },
-    [material, geometry],
-  );
-
-  const { instance } = self.current;
 
   useUpdateProps(instance, pureProps);
 
-  return render(children, instance);
+  return render(children, instance, false, { container: instance.current });
 });
 
 Object3D.defaultProps = {

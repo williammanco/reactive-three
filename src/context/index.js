@@ -5,39 +5,44 @@ import {
   useCallback,
   useRef,
   useEffect,
+  useImperativeHandle,
+  forwardRef,
 } from 'react';
 import actions from './actions';
 import reducer from './reducers';
 
 export const initialValue = {
   renderer: false,
+  object: false,
+  camera: false,
+  material: false,
+  geometry: false,
   rAF: [],
   resize: [],
-  render: [],
 };
 
 const Context = createContext(initialValue);
 
-const Provider = (props) => {
+const Reactive = forwardRef((props, ref) => {
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialValue);
-  const ref = useRef({});
+  const innerRef = useRef({});
 
   const onFrameLoop = useCallback((timestamp) => {
-    const { rAF } = ref.current;
+    const { rAF } = innerRef.current;
     for (let i = 0; i < rAF.length; i += 1) {
       rAF[i](timestamp);
     }
-    ref.current.id = global.requestAnimationFrame(onFrameLoop);
+    innerRef.current.id = global.requestAnimationFrame(onFrameLoop);
   }, []);
 
   const resetFrameLoop = useCallback(() => {
-    const { id } = ref.current;
+    const { id } = innerRef.current;
     global.cancelAnimationFrame(id);
   }, []);
 
   const onResize = useCallback(() => {
-    const { resize } = ref.current;
+    const { resize } = innerRef.current;
     const { innerWidth, innerHeight } = global;
     for (let i = 0; i < resize.length; i += 1) {
       resize[i](innerWidth, innerHeight);
@@ -45,8 +50,8 @@ const Provider = (props) => {
   });
 
   useEffect(() => {
-    ref.current.rAF = state.rAF;
-    ref.current.resize = state.resize;
+    innerRef.current.rAF = state.rAF;
+    innerRef.current.resize = state.resize;
   }, [state]);
 
   useEffect(() => {
@@ -58,9 +63,15 @@ const Provider = (props) => {
     };
   }, []);
 
+  useImperativeHandle(ref, () => ({
+    onResize,
+    resetFrameLoop,
+    onFrameLoop,
+  }));
+
   const value = { state, dispatch };
   return createElement(Context.Provider, { value }, children);
-};
+});
 
 
 const { Consumer } = Context;
@@ -68,7 +79,7 @@ const { Consumer } = Context;
 export default Context;
 
 export {
-  Provider,
+  Reactive,
   Consumer,
   actions,
 };

@@ -1,4 +1,3 @@
-import setUUID from 'uuid/v4';
 import Renderer from './Renderer';
 import Scene from './Scene';
 import Object from './Object';
@@ -10,7 +9,7 @@ import Light from './Light';
 import Loader from './Loader';
 import RenderTarget from './RenderTarget';
 import Controls from './Controls';
-import Context, { Provider, Consumer, actions } from './context';
+import Context, { Reactive, Consumer, actions } from './context';
 import render from './core/render';
 import * as hooks from './hooks';
 import * as propsTypes from './utils/propsTypes';
@@ -28,7 +27,7 @@ export {
   Loader,
   Render,
   Context,
-  Provider,
+  Reactive,
   Consumer,
   Controls,
   actions,
@@ -36,5 +35,4 @@ export {
   hooks,
   propsTypes,
   omit,
-  setUUID,
 };

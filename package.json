@@ -13,9 +13,7 @@
   "publishConfig": {
     "access": "private"
   },
-  "dependencies": {
-    "uuid": "^3.3.2"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "prop-types": "^15.6.2",
     "react": "^16.8.1",

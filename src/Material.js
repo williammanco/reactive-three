@@ -4,54 +4,31 @@ import {
   forwardRef,
 } from 'react';
 import render from './core/render';
-import { usePureProps, useUpdateProps } from './hooks';
-
-const THREE = require('three');
+import { usePureProps, useUpdateProps, useInstance } from './hooks';
 
 const Material = forwardRef(function Material({
   children,
-  parent,
-  geometry,
-  material,
+  map,
   loaded,
-  params,
-  use,
-  call,
   ...props
 }, ref) {
-  const self = useRef({});
   const pureProps = usePureProps(props);
-  const { instance } = self.current;
+  const instance = useRef();
+  instance.current = useInstance(props, ref);
 
   useEffect(
     () => {
-      const Instance = call || THREE[use];
-      if (instance) instance.dispose();
-      self.current.instance = new Instance(...params);
-      if (ref) ref(self.current.instance);
-      return () => {
-        if (instance) instance.dispose();
-      };
-    },
-    [use],
-  );
-
-  useEffect(
-    () => {
-      if (typeof loaded === 'object') {
-        self.current.instance.map = loaded;
-        self.current.instance.needsUpdate = true;
+      if (map || typeof loaded === 'object') {
+        instance.current.map = map || loaded;
+        instance.current.needsUpdate = true;
       }
     },
-    [loaded],
+    [map],
   );
 
   useUpdateProps(instance, pureProps);
 
-  return render(children, parent, {
-    geometry,
-    material: instance,
-  });
+  return render(children, instance, false, { material: instance.current });
 });
 
 Material.defaultProps = {
