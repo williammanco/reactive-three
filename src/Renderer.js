@@ -69,7 +69,7 @@ const Renderer = forwardRef(function Renderer({
 
       if (ref) ref(instance);
 
-      console.log(state.resize);
+      global.console.log(state.resize);
 
       return () => {
         destroy();
