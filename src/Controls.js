@@ -17,25 +17,24 @@ const Controls = forwardRef(function Controls({
   call,
   ...props
 }, ref) {
-  const self = useRef({});
+  const instance = useRef();
   const pureProps = usePureProps(props);
-  const { instance } = self.current;
 
   useEffect(
     () => {
-      if (instance) instance.dispose();
-      if (!parent) return;
+      if (instance.current) instance.current.dispose();
+      if (!parent.current) return;
       const Instance = call || THREE[use];
-      self.current.instance = new Instance(parent, ...params);
-      self.current.instance.update();
-      if (ref) ref(self.current.instance);
+      instance.current = new Instance(parent.current, ...params);
+
+      if (ref) ref(instance.current);
     },
-    [parent],
+    [],
   );
 
   useUpdateProps(instance, pureProps);
 
-  return render(children, parent);
+  return render(children, parent.current);
 });
 
 Controls.defaultProps = {

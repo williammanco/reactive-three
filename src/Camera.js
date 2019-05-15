@@ -1,60 +1,27 @@
 import {
-  useEffect,
-  useContext,
   useRef,
   forwardRef,
 } from 'react';
-import PropTypes from 'prop-types';
-import { nodeTypes } from './utils/propsTypes';
-import Context, { actions } from './context';
 import render from './core/render';
-import { usePureProps, useUpdateProps } from './hooks';
-
-const THREE = require('three');
+import { nodeTypes } from './utils/propsTypes';
+import { usePureProps, useUpdateProps, useInstance } from './hooks';
 
 const Camera = forwardRef(function Camera({
   children,
-  parent,
-  params,
-  use,
-  call,
   ...props
 }, ref) {
-  const { dispatch } = useContext(Context);
-  const self = useRef({});
-  const pureProps = usePureProps(props, ['renderer']);
-  const { instance } = self.current;
+  const pureProps = usePureProps(props);
+  const instance = useRef();
 
-  useEffect(
-    () => {
-      const Instance = call || THREE[use];
-      self.current.instance = new Instance(...params);
-      if (ref) ref(self.current.instance);
-    },
-    [],
-  );
-
-  useEffect(
-    () => {
-      if (!parent || !instance) return;
-      dispatch(actions.addCamera(instance, parent));
-      return () => {
-        dispatch(actions.removeCamera(instance, parent));
-      };
-    },
-    [parent, instance],
-  );
+  instance.current = useInstance(props, ref);
 
   useUpdateProps(instance, pureProps);
 
-  return render(children, instance);
+  return render(children, instance, false, { camera: instance });
 });
 
 Camera.propTypes = {
   children: nodeTypes,
-  call: nodeTypes,
-  use: PropTypes.string,
-  params: PropTypes.array,
 };
 
 Camera.defaultProps = {

@@ -1,64 +1,34 @@
 import {
-  useEffect,
-  useContext,
   useRef,
   forwardRef,
 } from 'react';
-import PropTypes from 'prop-types';
 import render from './core/render';
-import Context, { actions } from './context';
 import { nodeTypes } from './utils/propsTypes';
-import { usePureProps, useUpdateProps } from './hooks';
-
-const THREE = require('three');
+import { usePureProps, useUpdateProps, useInstance } from './hooks';
 
 const Scene = forwardRef(function Scene({
   children,
-  parent,
-  use,
-  call,
   ...props
 }, ref) {
-  const { dispatch } = useContext(Context);
-  const self = useRef({});
-  const pureProps = usePureProps(props, ['renderer']);
-  const { instance } = self.current;
+  const instance = useRef();
 
-  useEffect(
-    () => {
-      const Instance = call || THREE[use];
-      self.current.instance = new Instance();
-      if (ref) ref(self.current.instance);
-    },
-    [],
-  );
+  const pureProps = usePureProps(props);
 
-  useEffect(
-    () => {
-      if (!parent || !instance) return;
-      dispatch(actions.addScene(instance, parent));
-      return () => {
-        dispatch(actions.removeScene(instance, parent));
-      };
-    },
-    [parent, instance],
-  );
+  instance.current = useInstance(props, ref);
 
   useUpdateProps(instance, pureProps);
 
-  return render(children, instance);
+  return render(children, instance, false, { container: instance });
 });
 
 Scene.propTypes = {
   children: nodeTypes,
-  call: nodeTypes,
-  use: PropTypes.string,
 };
-
 
 Scene.defaultProps = {
   call: false,
   use: 'Scene',
+  params: [],
 };
 
 export default Scene;

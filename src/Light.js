@@ -16,31 +16,30 @@ const Light = forwardRef(function Light({
   call,
   ...props
 }, ref) {
-  const self = useRef({});
-  const { instance } = self.current;
+  const instance = useRef();
 
   const pureProps = usePureProps(props);
 
   useEffect(
     () => {
-      if (self.current.instance) return;
+      if (instance.current) return;
 
       const Instance = call || THREE[use];
-      self.current.instance = new Instance(...params);
-      if (ref) ref(self.current.instance);
+      instance.current = new Instance(...params);
+      if (ref) ref(instance.current);
     },
     [],
   );
 
   useEffect(
     () => {
-      if (!parent || !instance) return;
-      parent.add(instance);
+      if (!parent.current || !instance.current) return;
+      parent.current.add(instance.current);
       return () => {
-        parent.remove(instance);
+        parent.current.remove(instance.current);
       };
     },
-    [parent, instance],
+    [],
   );
 
   useUpdateProps(instance, pureProps);

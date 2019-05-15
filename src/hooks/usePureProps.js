@@ -12,6 +12,7 @@ export default (props, excludeProps = []) => useMemo(
       'loaded',
       'use',
       'call',
+      'debug',
     ],
   ), [props, excludeProps],
 );

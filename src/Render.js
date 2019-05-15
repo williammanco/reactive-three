@@ -1,11 +1,9 @@
 import {
-  useMemo,
   useContext,
   useCallback,
   useEffect,
   useRef,
 } from 'react';
-import setUUID from 'uuid/v4';
 import render from './core/render';
 import { usePureProps } from './hooks';
 import Context, { actions } from './context';
@@ -22,35 +20,21 @@ const Render = ({
     renderTarget: false,
     forceClear: false,
   });
-  const update = useRef();
+  const stateRef = useRef(state);
+
+  stateRef.current = state;
 
   const pureProps = usePureProps(props, [
     'renderTarget',
     'forceClear',
   ]);
 
-  const baseRender = useMemo(
-    () => ({
-      key: setUUID(),
-      camera: [],
-      scene: [],
-    }),
-    [],
-  );
-
-  const currentRender = useMemo(
-    () => {
-      const index = state.render.findIndex(e => e.key === baseRender.key);
-      if (index >= 0) return state.render[index];
-      return false;
-    }, [state.render],
-  );
-
   const onResize = useCallback(
     () => {
-      if (!self.current.renderer) return;
-      const { renderer } = self.current;
-      const { domElement } = renderer;
+      const { renderer, camera } = stateRef.current;
+
+      if (!renderer.current) return;
+      const { domElement } = renderer.current;
       let wrapper = global.document.body.getBoundingClientRect();
 
       if (domElement.parentElement) {
@@ -58,56 +42,45 @@ const Render = ({
       }
 
       const { width, height } = wrapper;
-      renderer.setSize(width, height);
+      renderer.current.setSize(width, height);
 
-      if (!update.current) return;
-      const { camera } = update.current;
+      if (!camera.current) return;
 
-      for (let i = 0; i < camera.length; i += 1) {
-        camera[i].aspect = width / height;
-        camera[i].updateProjectionMatrix();
-      }
+      camera.current.aspect = width / height;
+      camera.current.updateProjectionMatrix();
     },
     [],
   );
 
   const onRender = useCallback(
     () => {
-      const { scene, camera } = update.current;
-      const { renderer } = self.current;
+      const { container, camera, renderer } = stateRef.current;
+      if (!container.current || !camera.current || !renderer.current) return;
+
       const {
         clear, clearDepth, clearColor, clearStencil,
       } = pureProps;
       const rtt = self.current.renderTarget;
       const fClear = self.current.forceClear;
 
-      if (!renderer) return;
-      if (clear) renderer.clear();
-      if (clearDepth) renderer.clearDepth();
-      if (clearColor) renderer.clearColor();
-      if (clearStencil) renderer.clearStencil();
+      if (!renderer.current) return;
+      if (clear) renderer.current.clear();
+      if (clearDepth) renderer.current.clearDepth();
+      if (clearColor) renderer.current.clearColor();
+      if (clearStencil) renderer.current.clearStencil();
 
-      if (camera.length === 1) {
-        renderer.render(scene[0], camera[0], rtt, fClear);
-      } else if (camera.length > 1) {
-        for (let i = 0; i < camera.length; i += 1) {
-          if (camera[i].visible) {
-            renderer.render(scene[0], camera[i], rtt, fClear);
-          }
-        }
-      }
+      renderer.current.render(container.current, camera.current, rtt, fClear);
     },
     [],
   );
 
   useEffect(
     () => {
-      dispatch(actions.addRender(baseRender));
       dispatch(actions.addRaf(onRender));
       dispatch(actions.addResize(onResize));
+      onResize();
 
       return () => {
-        dispatch(actions.removeRender(baseRender));
         dispatch(actions.removeRaf(onRender));
         dispatch(actions.removeResize(onResize));
       };
@@ -117,27 +90,13 @@ const Render = ({
 
   useEffect(
     () => {
-      if (state.render.length > 0) {
-        update.current = currentRender;
-        onResize();
-      }
-    },
-    [state.render],
-  );
-
-  useEffect(
-    () => {
       self.current.renderTarget = renderTarget;
       self.current.forceClear = forceClear;
-      if (!parent) return;
-      self.current.renderer = parent;
     },
     [parent, renderTarget, forceClear],
   );
 
-  return render(children, baseRender.key, {
-    renderer: parent,
-  });
+  return render(children, true);
 };
 
 Render.defaultProps = {
