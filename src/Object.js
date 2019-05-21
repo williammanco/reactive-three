@@ -3,16 +3,20 @@ import {
   useRef,
   useContext,
   forwardRef,
+  useCallback,
 } from 'react';
 import render from './core/render';
 import Context from './context';
-import { usePureProps, useUpdateProps, useInstance } from './hooks';
+import {
+  usePureProps, useUpdateProps, useInstance,
+} from './hooks';
 
 const Object3D = forwardRef(function Object3D({
   children,
   parent,
   loaded,
   loader,
+  materialToChildren,
   ...props
 }, ref) {
   const instance = useRef();
@@ -33,19 +37,28 @@ const Object3D = forwardRef(function Object3D({
     ],
   }, ref, loaded || loader);
 
+  const applyMaterialToChildren = useCallback((item) => {
+    if (item.children.length > 0) {
+      item.children.forEach((child) => {
+        child.material = material;
+        applyMaterialToChildren(child, material);
+      });
+    }
+  }, []);
+
   useEffect(
     () => {
       if (loader && !loaded) return;
-      const { container } = context.current;
 
+      const { container } = context.current;
       if (loaded.isObject3D) {
         if (geometry) loaded.geometry = geometry;
         if (material) loaded.material = material;
+        if (materialToChildren) applyMaterialToChildren(loaded);
         instance.current = loaded;
       }
 
       container.current.add(instance.current);
-
       return () => {
         container.current.remove(instance.current);
       };

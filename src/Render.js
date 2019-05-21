@@ -60,8 +60,9 @@ const Render = ({
       const {
         clear, clearDepth, clearColor, clearStencil,
       } = pureProps;
-      const rtt = self.current.renderTarget;
-      const fClear = self.current.forceClear;
+      // TODO: deprecated renderTarget and forceClear - fix soon
+      // const rtt = self.current.renderTarget;
+      // const fClear = self.current.forceClear;
 
       if (!renderer.current) return;
       if (clear) renderer.current.clear();
@@ -69,7 +70,7 @@ const Render = ({
       if (clearColor) renderer.current.clearColor();
       if (clearStencil) renderer.current.clearStencil();
 
-      renderer.current.render(container.current, camera.current, rtt, fClear);
+      renderer.current.render(container.current, camera.current);
     },
     [],
   );

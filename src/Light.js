@@ -3,10 +3,10 @@ import {
   useRef,
   forwardRef,
 } from 'react';
+import * as THREE from 'three';
 import render from './core/render';
 import { usePureProps, useUpdateProps } from './hooks';
 
-const THREE = require('three');
 
 const Light = forwardRef(function Light({
   children,

@@ -9,16 +9,14 @@ const Geometry = forwardRef(function Geometry({
   children,
   ...props
 }, ref) {
-  const self = useRef({});
+  const instance = useRef();
   const pureProps = usePureProps(props);
 
-  self.current.instance = useInstance(props, ref);
-
-  const { instance } = self.current;
+  instance.current = useInstance(props, ref);
 
   useUpdateProps(instance, pureProps);
 
-  return render(children, instance, false, { geometry: instance });
+  return render(children, instance, false, { geometry: instance.current });
 });
 
 Geometry.defaultProps = {
