@@ -1,15 +1,15 @@
 {
-  "name": "reactive-three",
+  "name": "@reactive-three/reactive-three",
   "version": "0.1.2",
   "description": "React.js -> Three.js",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:williammanco/reactive-three.git"
+    "url": "git+ssh://git@github.com/williammanco/reactive-three.git"
   },
   "keywords": [],
   "author": "William Manco <wmanco88@gmail.com>",
-  "license": "GPLv3",
+  "license": "GPL-3.0-or-later",
   "publishConfig": {
     "access": "private"
   },
@@ -29,5 +29,11 @@
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-react": "^7.12.4"
   },
-  "gitHead": ""
+  "bugs": {
+    "url": "https://github.com/williammanco/reactive-three/issues"
+  },
+  "homepage": "https://github.com/williammanco/reactive-three#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
 }
