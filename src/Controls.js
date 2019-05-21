@@ -3,10 +3,10 @@ import {
   useRef,
   forwardRef,
 } from 'react';
+import * as THREE from 'three';
 import render from './core/render';
-import { usePureProps, useUpdateProps } from './hooks';
+import { usePureProps, useUpdateProps, useForwardRef } from './hooks';
 
-const THREE = require('three');
 
 const Controls = forwardRef(function Controls({
   getRef,
@@ -26,11 +26,11 @@ const Controls = forwardRef(function Controls({
       if (!parent.current) return;
       const Instance = call || THREE[use];
       instance.current = new Instance(parent.current, ...params);
-
-      if (ref) ref(instance.current);
     },
     [],
   );
+
+  useForwardRef(ref, instance);
 
   useUpdateProps(instance, pureProps);
 

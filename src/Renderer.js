@@ -8,12 +8,11 @@ import {
   useContext,
 } from 'react';
 import PropTypes from 'prop-types';
+import * as THREE from 'three';
 import { nodeTypes, stringTypes } from './utils/propsTypes';
 import render from './core/render';
-import { usePureProps, useUpdateProps } from './hooks';
+import { usePureProps, useUpdateProps, useForwardRef } from './hooks';
 import Context from './context';
-
-const THREE = require('three');
 
 const Renderer = forwardRef(function Renderer({
   children,
@@ -67,9 +66,6 @@ const Renderer = forwardRef(function Renderer({
 
       instance.current.setPixelRatio(pixelRatio);
 
-      if (ref) ref(instance);
-
-      global.console.log(state.resize);
 
       return () => {
         destroy();
@@ -77,6 +73,8 @@ const Renderer = forwardRef(function Renderer({
     },
     [target],
   );
+
+  useForwardRef(ref, instance);
 
   useUpdateProps(instance, pureProps);
 

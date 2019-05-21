@@ -4,11 +4,11 @@ import {
   forwardRef,
 } from 'react';
 import PropTypes from 'prop-types';
+import * as THREE from 'three';
 import { nodeTypes } from './utils/propsTypes';
 import render from './core/render';
 import { usePureProps, useUpdateProps } from './hooks';
 
-const THREE = require('three');
 
 const RenderTarget = forwardRef(function RenderTarget({
   children,

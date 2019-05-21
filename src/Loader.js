@@ -4,11 +4,12 @@ import {
   forwardRef,
   useContext,
 } from 'react';
+import * as THREE from 'three';
 import render from './core/render';
-import { usePureProps, useUpdateProps, useWillMount } from './hooks';
+import {
+  usePureProps, useUpdateProps, useWillMount, useForwardRef,
+} from './hooks';
 import Context from './context';
-
-const THREE = require('three');
 
 const Loader = forwardRef(function Loader({
   children,
@@ -22,9 +23,8 @@ const Loader = forwardRef(function Loader({
   call,
   ...props
 }, ref) {
-  const self = useRef({});
   const [loaded, setLoaded] = useState(false);
-  let { instance } = self.current;
+  const instance = useRef();
 
   const pureProps = usePureProps(props, [
     'url',
@@ -34,21 +34,21 @@ const Loader = forwardRef(function Loader({
   ]);
 
   useWillMount(() => {
-    if (instance) return;
+    if (instance.current) return;
     const Instance = call || THREE[use];
-    instance = new Instance(...params);
-    instance.load(
+    instance.current = new Instance(...params);
+    instance.current.load(
       url,
       (object) => {
-        self.current.loaded = object;
         setLoaded(object);
         onLoad(object);
       },
       onProgress,
       onError,
     );
-    if (ref) ref(instance);
   });
+
+  useForwardRef(ref, instance);
 
   useUpdateProps(instance, pureProps);
 

@@ -24,7 +24,7 @@ export default (props, ref, loaded) => {
     const Instance = call || THREE[use];
 
     instance.current = loadedRef.current || new Instance(...params);
-    updateProps(instance.current, pureProps);
+    updateProps(instance, pureProps);
     const { name, type } = instance.current;
     // if (fn) fn();
     if (debug) {
@@ -44,7 +44,8 @@ export default (props, ref, loaded) => {
     if (loaded) loadedRef.current = loaded;
 
     if (!isMount.current) setInstance();
-    if (ref) ref(instance.current);
+    if (typeof ref === 'object' && ref !== null) ref.current = instance.current; // eslint-disable-line
+    if (typeof (ref) === 'function') ref(instance.current);
 
     const { name, type } = instance.current;
     if (debug) {
